@@ -36,13 +36,14 @@ double* stft(double *wav_data, int wav_length, int windowSize, int hop_size, dou
   fftw_complex *stft_data, *fft_result;
   fftw_complex scale;
   //the scaling factor
-  scale =  1.0/(2 * windowSize -1);
+  scale =  1.0/(wav_length*windowSize -1);
   //allocate the memory for the fftw
   stft_data = (fftw_complex*)(fftw_malloc(sizeof(fftw_complex)*windowSize));
   fft_result= (fftw_complex*)(fftw_malloc(sizeof(fftw_complex)*windowSize));
   //define the fftw plane
-  fftw_plan plan_forward, plan_backward;
+  fftw_plan plan_forward;
   plan_forward = fftw_plan_dft_1d(windowSize, stft_data, fft_result, FFTW_FORWARD, FFTW_ESTIMATE);
+
   //integer indexes
   int i,counter ;
   counter = 0 ;
@@ -85,7 +86,7 @@ double* stft(double *wav_data, int wav_length, int windowSize, int hop_size, dou
     //compute the fft
     fftw_execute(plan_forward);
     //store the stft in a data structure
-    for (i=0; i<windowSize/2; i++)
+    for (i=0; i<windowSize -1; i++)
     {
       //conjugate = (complex double)fft_result[i+1];
       //printf("Elements R %.2f, I %.2f\n",creal(fft_result[i]), cimag(fft_result[i]));
@@ -100,7 +101,6 @@ double* stft(double *wav_data, int wav_length, int windowSize, int hop_size, dou
       //printf("Re: %.2f  , Im: %.2f \n", fft_result[i][0], fft_result[i][1]);
       //printf("Re: %2.f  , Im: %.2f \n",fft_result[i+1][0], fft_result[i+1][1]);
     }
-    //ifft of the storage
 
 
     chunkPosition += hop_size;
@@ -151,11 +151,11 @@ double* stft(double *wav_data, int wav_length, int windowSize, int hop_size, dou
 
   return correlation_result ;
 
-  //fftw_destroy_plan(plan_forward);
-  //fftw_free(stft_data);
-  //fftw_free(fft_result);
+  fftw_destroy_plan(plan_forward);
+  fftw_free(stft_data);
+  fftw_free(fft_result);
   //fftw_free(ifft_result);//do we need a ifft?
-  //free(hamming_result);
+  free(hamming_result);
 
 
 }

@@ -31,11 +31,16 @@ cdef extern from "c_code/stft.c":
 
 cpdef play():
     #wav_data is the wave file, already opened with scipy
-    rate, audData = scipy.io.wavfile.read("wav/canon.wav")
-    length = audData.shape[0] #/rate #take only the first 10 seconds
+    rate, audData = scipy.io.wavfile.read("wav/fugue.wav")
+    length = 1024000#audData.shape[0] #/rate #take only the first 10 seconds
     #channel1 = audData[:,0][6740000:22342656]
     #channel2 = audData[:,1][6740000:22342656]
-    channel1 = audData[:,0]
+    channel1 = audData#[:,0]
+
+    #save what you are analysing
+    save_wav = channel1[0:length]
+    scipy.io.wavfile.write("study.wav",rate,save_wav)
+
     print(len(channel1))
     #here we could have a float and not a double
     #channel1 = np.float32(channel1)
@@ -60,4 +65,6 @@ cpdef play():
 
     stft(&audData_view[0], length, wind_length, hop_size,&correlation_result[0])
     correlation_python = np.asarray(correlation_result)
+
+    print(correlation_python)
     return (correlation_python)
