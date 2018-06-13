@@ -29,17 +29,21 @@ double* stft(double *wav_data, int wav_length, int windowSize, int hop_size, dou
   //hamming_result = malloc(sizeof(double));
 
   //define the total number of samples
-  int n_samples ;
+  int n_samples,storage_capacity ;
   n_samples = (wav_length) ;
+  storage_capacity = (wav_length);
   printf("Total number of samples in C %d\n", n_samples);
   //define the fourier variables
-  fftw_complex *stft_data, *fft_result;
+  fftw_complex *stft_data, *fft_result, *storage;
   fftw_complex scale;
   //the scaling factor
-  scale =  1.0/(wav_length*windowSize -1);
+  scale =  1.0/(wav_length*windowSize -1);  //wav_length*windowSize is the total number of samples
   //allocate the memory for the fftw
   stft_data = (fftw_complex*)(fftw_malloc(sizeof(fftw_complex)*windowSize));
   fft_result= (fftw_complex*)(fftw_malloc(sizeof(fftw_complex)*windowSize));
+  storage = (fftw_complex*)(fftw_malloc(sizeof(fftw_complex)*storage_capacity));
+  printf("Total length of storage %d\n", (storage_capacity));
+  //exit(0);
   //define the fftw plane
   fftw_plan plan_forward;
   plan_forward = fftw_plan_dft_1d(windowSize, stft_data, fft_result, FFTW_FORWARD, FFTW_ESTIMATE);
@@ -86,20 +90,10 @@ double* stft(double *wav_data, int wav_length, int windowSize, int hop_size, dou
     //compute the fft
     fftw_execute(plan_forward);
     //store the stft in a data structure
-    for (i=0; i<windowSize -1; i++)
+    for (i=0; i<windowSize;i++)
     {
-      //conjugate = (complex double)fft_result[i+1];
-      //printf("Elements R %.2f, I %.2f\n",creal(fft_result[i]), cimag(fft_result[i]));
-      correlation = fft_result[i]*conj(fft_result[i])*scale;
-      correlation_result[counter] = correlation ;
+      storage[counter] = creal(fft_result[i]) + cimag(fft_result[i]);
       counter+=1;
-      //printf("%2.2f, %2.2f\n", fft_result[i][0], fft_result[i][1]);
-      //printf("%2.2f\n", fft_result[i][0]);
-      //save fft_result in a data structure
-      //test teh correlation
-
-      //printf("Re: %.2f  , Im: %.2f \n", fft_result[i][0], fft_result[i][1]);
-      //printf("Re: %2.f  , Im: %.2f \n",fft_result[i+1][0], fft_result[i+1][1]);
     }
 
 
@@ -110,6 +104,28 @@ double* stft(double *wav_data, int wav_length, int windowSize, int hop_size, dou
 
   }
 
+  //compute the correlation
+  for ( i=0; i<windowSize;i++)
+  {
+
+  }
+
+/*correlation  for (i=0; i<windowSize; i++)
+  {
+    //conjugate = (complex double)fft_result[i+1];
+    //printf("Elements R %.2f, I %.2f\n",creal(fft_result[i]), cimag(fft_result[i]));
+    //correlation = fft_result[i]*conj(fft_result[i+1])*scale;
+    correlation_result[counter] = correlation ;
+    counter+=1;
+    //printf("%2.2f, %2.2f\n", fft_result[i][0], fft_result[i][1]);
+    //printf("%2.2f\n", fft_result[i][0]);
+    //save fft_result in a data structure
+    //test teh correlation
+
+    //printf("Re: %.2f  , Im: %.2f \n", fft_result[i][0], fft_result[i][1]);
+    //printf("Re: %2.f  , Im: %.2f \n",fft_result[i+1][0], fft_result[i+1][1]);
+  }
+  */
 
   //sanity check
 

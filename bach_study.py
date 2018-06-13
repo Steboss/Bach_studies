@@ -7,13 +7,29 @@ import sys,os
 import seaborn as sbn
 sbn.set_style("whitegrid")
 
-#scipy.signal.stft(x, fs=1.0, window='hann', nperseg=256, noverlap=None, nfft=None, detrend=False,
-#                  return_onesided=True, boundary='zeros', padded=True, axis=-1)[source]
-#load the inputdata
-correlation = stft.play()
+#read the input file
+rate, audData = scipy.io.wavfile.read("wav/canon.wav")
+#extract the info
+length = audData.shape[0] # this is the number of samples,
+#if you divide length by the rateyou get the length in seconds /rate
+channel1 = audData[:,0]
+#convert in double format
+channel1 = np.double(channel1)
+
+#channel2 = audData[:,1]
+windowSize = 1024 #length of the window to analyse with STFT
+hopSize = 1024  #hopsize between windows
+
+#UNCOMMENT if you want to analyse just a piece of the entire wav
+#save_wav = audData[:,0][start:end]
+#scipy.io.wavfile.write("study.wav",rate,save_wav)
+
+#compute the STFT
+correlation = stft.play(channel1, rate, length , windowSize, hopSize)
+
 #PLOT
 #x-axis for  the data
-x_axis_ref = np.linspace(0, len(correlation),len(correlation))
+x_axis_ref = np.linspace(0, len(correlation)/1024,len(correlation))
 #colors andfigure
 colors= sbn.color_palette()
 col_ref = sbn.color_palette("cubehelix", 8)
