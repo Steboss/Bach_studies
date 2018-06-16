@@ -2014,7 +2014,7 @@ static PyObject *__pyx_tuple__22;
 static PyObject *__pyx_tuple__23;
 static PyObject *__pyx_tuple__24;
 
-/* "stft.pyx":32
+/* "stft.pyx":33
  * 
  * 
  * cpdef play(audData, rate, length,windowSize,hopSize):             # <<<<<<<<<<<<<<
@@ -2023,11 +2023,12 @@ static PyObject *__pyx_tuple__24;
  */
 
 static PyObject *__pyx_pw_4stft_1play(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_4stft_play(PyObject *__pyx_v_audData, CYTHON_UNUSED PyObject *__pyx_v_rate, PyObject *__pyx_v_length, PyObject *__pyx_v_windowSize, PyObject *__pyx_v_hopSize, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static PyObject *__pyx_f_4stft_play(PyObject *__pyx_v_audData, PyObject *__pyx_v_rate, PyObject *__pyx_v_length, PyObject *__pyx_v_windowSize, PyObject *__pyx_v_hopSize, CYTHON_UNUSED int __pyx_skip_dispatch) {
   __Pyx_memviewslice __pyx_v_audData_view = { 0, 0, { 0 }, { 0 }, { 0 } };
   PyObject *__pyx_v_n_samples = NULL;
   __Pyx_memviewslice __pyx_v_correlation_result = { 0, 0, { 0 }, { 0 }, { 0 } };
-  PyObject *__pyx_v_correlation_python = NULL;
+  __Pyx_memviewslice __pyx_v_magnitude = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_frequencies = { 0, 0, { 0 }, { 0 }, { 0 } };
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_memviewslice __pyx_t_1 = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -2041,10 +2042,12 @@ static PyObject *__pyx_f_4stft_play(PyObject *__pyx_v_audData, CYTHON_UNUSED PyO
   int __pyx_t_9;
   Py_ssize_t __pyx_t_10;
   int __pyx_t_11;
-  PyObject *__pyx_t_12 = NULL;
+  Py_ssize_t __pyx_t_12;
+  Py_ssize_t __pyx_t_13;
+  PyObject *__pyx_t_14 = NULL;
   __Pyx_RefNannySetupContext("play", 0);
 
-  /* "stft.pyx":35
+  /* "stft.pyx":36
  * 
  *     #create a memory view, pointer, that can be processed in C
  *     cdef double[:] audData_view = audData             # <<<<<<<<<<<<<<
@@ -2052,45 +2055,45 @@ static PyObject *__pyx_f_4stft_play(PyObject *__pyx_v_audData, CYTHON_UNUSED PyO
  *     n_samples = int(length)
  */
   __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_v_audData);
-  if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 35, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 36, __pyx_L1_error)
   __pyx_v_audData_view = __pyx_t_1;
   __pyx_t_1.memview = NULL;
   __pyx_t_1.data = NULL;
 
-  /* "stft.pyx":37
+  /* "stft.pyx":38
  *     cdef double[:] audData_view = audData
  *     #the total length of the correlation arrays is :
  *     n_samples = int(length)             # <<<<<<<<<<<<<<
  *     print("Total number of samples in Cython %d" % n_samples)
  *     #create a view for the  double * correlation result pointer of C
  */
-  __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_v_length); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_v_length); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 38, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_n_samples = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "stft.pyx":38
+  /* "stft.pyx":39
  *     #the total length of the correlation arrays is :
  *     n_samples = int(length)
  *     print("Total number of samples in Cython %d" % n_samples)             # <<<<<<<<<<<<<<
  *     #create a view for the  double * correlation result pointer of C
- *     cdef double[:] correlation_result = np.zeros(n_samples)
+ *     cdef double[:] correlation_result = np.zeros(length)
  */
-  __pyx_t_2 = __Pyx_PyString_Format(__pyx_kp_s_Total_number_of_samples_in_Cytho, __pyx_v_n_samples); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 38, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyString_Format(__pyx_kp_s_Total_number_of_samples_in_Cytho, __pyx_v_n_samples); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_PrintOne(0, __pyx_t_2) < 0) __PYX_ERR(0, 38, __pyx_L1_error)
+  if (__Pyx_PrintOne(0, __pyx_t_2) < 0) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stft.pyx":40
+  /* "stft.pyx":41
  *     print("Total number of samples in Cython %d" % n_samples)
  *     #create a view for the  double * correlation result pointer of C
- *     cdef double[:] correlation_result = np.zeros(n_samples)             # <<<<<<<<<<<<<<
- * 
- *     print("Analysis with these parameters:")
+ *     cdef double[:] correlation_result = np.zeros(length)             # <<<<<<<<<<<<<<
+ *     #a view for the magnitude
+ *     cdef double[:] magnitude = np.zeros(length)
  */
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 41, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 41, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -2104,78 +2107,166 @@ static PyObject *__pyx_f_4stft_play(PyObject *__pyx_v_audData, CYTHON_UNUSED PyO
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_n_samples); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 40, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_length); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 41, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   } else {
-    __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 40, __pyx_L1_error)
+    __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 41, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3); __pyx_t_3 = NULL;
-    __Pyx_INCREF(__pyx_v_n_samples);
-    __Pyx_GIVEREF(__pyx_v_n_samples);
-    PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_v_n_samples);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 40, __pyx_L1_error)
+    __Pyx_INCREF(__pyx_v_length);
+    __Pyx_GIVEREF(__pyx_v_length);
+    PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_v_length);
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 41, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_2);
-  if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 40, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 41, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_correlation_result = __pyx_t_1;
   __pyx_t_1.memview = NULL;
   __pyx_t_1.data = NULL;
 
-  /* "stft.pyx":42
- *     cdef double[:] correlation_result = np.zeros(n_samples)
+  /* "stft.pyx":43
+ *     cdef double[:] correlation_result = np.zeros(length)
+ *     #a view for the magnitude
+ *     cdef double[:] magnitude = np.zeros(length)             # <<<<<<<<<<<<<<
+ *     #a view for the frequencies
+ *     cdef double[:] frequencies = np.zeros(length)
+ */
+  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 43, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_zeros); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 43, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = NULL;
+  if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_5))) {
+    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_5);
+    if (likely(__pyx_t_4)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+      __Pyx_INCREF(__pyx_t_4);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_5, function);
+    }
+  }
+  if (!__pyx_t_4) {
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_v_length); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 43, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+  } else {
+    __pyx_t_3 = PyTuple_New(1+1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 43, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4); __pyx_t_4 = NULL;
+    __Pyx_INCREF(__pyx_v_length);
+    __Pyx_GIVEREF(__pyx_v_length);
+    PyTuple_SET_ITEM(__pyx_t_3, 0+1, __pyx_v_length);
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 43, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  }
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_2);
+  if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 43, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_v_magnitude = __pyx_t_1;
+  __pyx_t_1.memview = NULL;
+  __pyx_t_1.data = NULL;
+
+  /* "stft.pyx":45
+ *     cdef double[:] magnitude = np.zeros(length)
+ *     #a view for the frequencies
+ *     cdef double[:] frequencies = np.zeros(length)             # <<<<<<<<<<<<<<
+ * 
+ *     print("Analysis with these parameters:")
+ */
+  __pyx_t_5 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_5 = NULL;
+  if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_3);
+    if (likely(__pyx_t_5)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_5);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_3, function);
+    }
+  }
+  if (!__pyx_t_5) {
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_length); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 45, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+  } else {
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 45, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_5); __pyx_t_5 = NULL;
+    __Pyx_INCREF(__pyx_v_length);
+    __Pyx_GIVEREF(__pyx_v_length);
+    PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_v_length);
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 45, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  }
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_2);
+  if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_v_frequencies = __pyx_t_1;
+  __pyx_t_1.memview = NULL;
+  __pyx_t_1.data = NULL;
+
+  /* "stft.pyx":47
+ *     cdef double[:] frequencies = np.zeros(length)
  * 
  *     print("Analysis with these parameters:")             # <<<<<<<<<<<<<<
  *     print("Length of the signal %d" % length)
  *     print("Windows length %d" % windowSize)
  */
-  if (__Pyx_PrintOne(0, __pyx_kp_s_Analysis_with_these_parameters) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  if (__Pyx_PrintOne(0, __pyx_kp_s_Analysis_with_these_parameters) < 0) __PYX_ERR(0, 47, __pyx_L1_error)
 
-  /* "stft.pyx":43
+  /* "stft.pyx":48
  * 
  *     print("Analysis with these parameters:")
  *     print("Length of the signal %d" % length)             # <<<<<<<<<<<<<<
  *     print("Windows length %d" % windowSize)
  *     print("Hopping size %d" % hopSize)
  */
-  __pyx_t_2 = __Pyx_PyString_Format(__pyx_kp_s_Length_of_the_signal_d, __pyx_v_length); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 43, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyString_Format(__pyx_kp_s_Length_of_the_signal_d, __pyx_v_length); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 48, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_PrintOne(0, __pyx_t_2) < 0) __PYX_ERR(0, 43, __pyx_L1_error)
+  if (__Pyx_PrintOne(0, __pyx_t_2) < 0) __PYX_ERR(0, 48, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stft.pyx":44
+  /* "stft.pyx":49
  *     print("Analysis with these parameters:")
  *     print("Length of the signal %d" % length)
  *     print("Windows length %d" % windowSize)             # <<<<<<<<<<<<<<
  *     print("Hopping size %d" % hopSize)
  * 
  */
-  __pyx_t_2 = __Pyx_PyString_Format(__pyx_kp_s_Windows_length_d, __pyx_v_windowSize); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyString_Format(__pyx_kp_s_Windows_length_d, __pyx_v_windowSize); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 49, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_PrintOne(0, __pyx_t_2) < 0) __PYX_ERR(0, 44, __pyx_L1_error)
+  if (__Pyx_PrintOne(0, __pyx_t_2) < 0) __PYX_ERR(0, 49, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stft.pyx":45
+  /* "stft.pyx":50
  *     print("Length of the signal %d" % length)
  *     print("Windows length %d" % windowSize)
  *     print("Hopping size %d" % hopSize)             # <<<<<<<<<<<<<<
  * 
- *     stft(&audData_view[0], length, windowSize, hopSize,&correlation_result[0])
+ *     stft(&audData_view[0], length, windowSize, hopSize,&correlation_result[0],\
  */
-  __pyx_t_2 = __Pyx_PyString_Format(__pyx_kp_s_Hopping_size_d, __pyx_v_hopSize); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyString_Format(__pyx_kp_s_Hopping_size_d, __pyx_v_hopSize); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 50, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_PrintOne(0, __pyx_t_2) < 0) __PYX_ERR(0, 45, __pyx_L1_error)
+  if (__Pyx_PrintOne(0, __pyx_t_2) < 0) __PYX_ERR(0, 50, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stft.pyx":47
+  /* "stft.pyx":52
  *     print("Hopping size %d" % hopSize)
  * 
- *     stft(&audData_view[0], length, windowSize, hopSize,&correlation_result[0])             # <<<<<<<<<<<<<<
- *     correlation_python = np.asarray(correlation_result)
- * 
+ *     stft(&audData_view[0], length, windowSize, hopSize,&correlation_result[0],\             # <<<<<<<<<<<<<<
+ *          &magnitude[0], &frequencies[0], rate)
+ *     #correlation_python = np.asarray(correlation_result)
  */
   __pyx_t_6 = 0;
   __pyx_t_7 = -1;
@@ -2185,11 +2276,11 @@ static PyObject *__pyx_f_4stft_play(PyObject *__pyx_v_audData, CYTHON_UNUSED PyO
   } else if (unlikely(__pyx_t_6 >= __pyx_v_audData_view.shape[0])) __pyx_t_7 = 0;
   if (unlikely(__pyx_t_7 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_7);
-    __PYX_ERR(0, 47, __pyx_L1_error)
+    __PYX_ERR(0, 52, __pyx_L1_error)
   }
-  __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_v_length); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 47, __pyx_L1_error)
-  __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_v_windowSize); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 47, __pyx_L1_error)
-  __pyx_t_9 = __Pyx_PyInt_As_int(__pyx_v_hopSize); if (unlikely((__pyx_t_9 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 47, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_v_length); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 52, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_v_windowSize); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 52, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyInt_As_int(__pyx_v_hopSize); if (unlikely((__pyx_t_9 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 52, __pyx_L1_error)
   __pyx_t_10 = 0;
   __pyx_t_11 = -1;
   if (__pyx_t_10 < 0) {
@@ -2198,72 +2289,166 @@ static PyObject *__pyx_f_4stft_play(PyObject *__pyx_v_audData, CYTHON_UNUSED PyO
   } else if (unlikely(__pyx_t_10 >= __pyx_v_correlation_result.shape[0])) __pyx_t_11 = 0;
   if (unlikely(__pyx_t_11 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_11);
-    __PYX_ERR(0, 47, __pyx_L1_error)
+    __PYX_ERR(0, 52, __pyx_L1_error)
   }
-  stft((&(*((double *) ( /* dim=0 */ (__pyx_v_audData_view.data + __pyx_t_6 * __pyx_v_audData_view.strides[0]) )))), __pyx_t_7, __pyx_t_8, __pyx_t_9, (&(*((double *) ( /* dim=0 */ (__pyx_v_correlation_result.data + __pyx_t_10 * __pyx_v_correlation_result.strides[0]) )))));
 
-  /* "stft.pyx":48
+  /* "stft.pyx":53
  * 
- *     stft(&audData_view[0], length, windowSize, hopSize,&correlation_result[0])
- *     correlation_python = np.asarray(correlation_result)             # <<<<<<<<<<<<<<
- * 
- *     print(correlation_python)
+ *     stft(&audData_view[0], length, windowSize, hopSize,&correlation_result[0],\
+ *          &magnitude[0], &frequencies[0], rate)             # <<<<<<<<<<<<<<
+ *     #correlation_python = np.asarray(correlation_result)
+ *     magnitude = np.asarray(magnitude)
  */
-  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 48, __pyx_L1_error)
+  __pyx_t_12 = 0;
+  __pyx_t_11 = -1;
+  if (__pyx_t_12 < 0) {
+    __pyx_t_12 += __pyx_v_magnitude.shape[0];
+    if (unlikely(__pyx_t_12 < 0)) __pyx_t_11 = 0;
+  } else if (unlikely(__pyx_t_12 >= __pyx_v_magnitude.shape[0])) __pyx_t_11 = 0;
+  if (unlikely(__pyx_t_11 != -1)) {
+    __Pyx_RaiseBufferIndexError(__pyx_t_11);
+    __PYX_ERR(0, 53, __pyx_L1_error)
+  }
+  __pyx_t_13 = 0;
+  __pyx_t_11 = -1;
+  if (__pyx_t_13 < 0) {
+    __pyx_t_13 += __pyx_v_frequencies.shape[0];
+    if (unlikely(__pyx_t_13 < 0)) __pyx_t_11 = 0;
+  } else if (unlikely(__pyx_t_13 >= __pyx_v_frequencies.shape[0])) __pyx_t_11 = 0;
+  if (unlikely(__pyx_t_11 != -1)) {
+    __Pyx_RaiseBufferIndexError(__pyx_t_11);
+    __PYX_ERR(0, 53, __pyx_L1_error)
+  }
+  __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_v_rate); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 53, __pyx_L1_error)
+
+  /* "stft.pyx":52
+ *     print("Hopping size %d" % hopSize)
+ * 
+ *     stft(&audData_view[0], length, windowSize, hopSize,&correlation_result[0],\             # <<<<<<<<<<<<<<
+ *          &magnitude[0], &frequencies[0], rate)
+ *     #correlation_python = np.asarray(correlation_result)
+ */
+  stft((&(*((double *) ( /* dim=0 */ (__pyx_v_audData_view.data + __pyx_t_6 * __pyx_v_audData_view.strides[0]) )))), __pyx_t_7, __pyx_t_8, __pyx_t_9, (&(*((double *) ( /* dim=0 */ (__pyx_v_correlation_result.data + __pyx_t_10 * __pyx_v_correlation_result.strides[0]) )))), (&(*((double *) ( /* dim=0 */ (__pyx_v_magnitude.data + __pyx_t_12 * __pyx_v_magnitude.strides[0]) )))), (&(*((double *) ( /* dim=0 */ (__pyx_v_frequencies.data + __pyx_t_13 * __pyx_v_frequencies.strides[0]) )))), __pyx_t_11);
+
+  /* "stft.pyx":55
+ *          &magnitude[0], &frequencies[0], rate)
+ *     #correlation_python = np.asarray(correlation_result)
+ *     magnitude = np.asarray(magnitude)             # <<<<<<<<<<<<<<
+ *     frequencies = np.asarray(frequencies)
+ * 
+ */
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 55, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_asarray); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 55, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_asarray); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 48, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_magnitude, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 55, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_5 = NULL;
+  if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_4))) {
+    __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_4);
+    if (likely(__pyx_t_5)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_5);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_4, function);
+    }
+  }
+  if (!__pyx_t_5) {
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 55, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_GOTREF(__pyx_t_2);
+  } else {
+    __pyx_t_14 = PyTuple_New(1+1); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 55, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_14);
+    __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_14, 0, __pyx_t_5); __pyx_t_5 = NULL;
+    __Pyx_GIVEREF(__pyx_t_3);
+    PyTuple_SET_ITEM(__pyx_t_14, 0+1, __pyx_t_3);
+    __pyx_t_3 = 0;
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_14, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 55, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+  }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __pyx_memoryview_fromslice(__pyx_v_correlation_result, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 48, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_2);
+  if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 55, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __PYX_XDEC_MEMVIEW(&__pyx_v_magnitude, 1);
+  __pyx_v_magnitude = __pyx_t_1;
+  __pyx_t_1.memview = NULL;
+  __pyx_t_1.data = NULL;
+
+  /* "stft.pyx":56
+ *     #correlation_python = np.asarray(correlation_result)
+ *     magnitude = np.asarray(magnitude)
+ *     frequencies = np.asarray(frequencies)             # <<<<<<<<<<<<<<
+ * 
+ *     #print(correlation_python)
+ */
+  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_asarray); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_14);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = __pyx_memoryview_fromslice(__pyx_v_frequencies, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 56, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_3 = NULL;
-  if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_5))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_5);
+  if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_14))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_14);
     if (likely(__pyx_t_3)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_14);
       __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_5, function);
+      __Pyx_DECREF_SET(__pyx_t_14, function);
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 48, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_14, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 56, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_GOTREF(__pyx_t_2);
   } else {
-    __pyx_t_12 = PyTuple_New(1+1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 48, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_12);
-    __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_12, 0, __pyx_t_3); __pyx_t_3 = NULL;
+    __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 56, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3); __pyx_t_3 = NULL;
     __Pyx_GIVEREF(__pyx_t_4);
-    PyTuple_SET_ITEM(__pyx_t_12, 0+1, __pyx_t_4);
+    PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_4);
     __pyx_t_4 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_12, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 48, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_14, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 56, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_v_correlation_python = __pyx_t_2;
-  __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_2);
+  if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __PYX_XDEC_MEMVIEW(&__pyx_v_frequencies, 1);
+  __pyx_v_frequencies = __pyx_t_1;
+  __pyx_t_1.memview = NULL;
+  __pyx_t_1.data = NULL;
 
-  /* "stft.pyx":50
- *     correlation_python = np.asarray(correlation_result)
- * 
- *     print(correlation_python)             # <<<<<<<<<<<<<<
- *     return (correlation_python)
- */
-  if (__Pyx_PrintOne(0, __pyx_v_correlation_python) < 0) __PYX_ERR(0, 50, __pyx_L1_error)
-
-  /* "stft.pyx":51
- * 
- *     print(correlation_python)
- *     return (correlation_python)             # <<<<<<<<<<<<<<
+  /* "stft.pyx":60
+ *     #print(correlation_python)
+ *     #return (correlation_python)
+ *     return (magnitude, frequencies)             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_INCREF(__pyx_v_correlation_python);
-  __pyx_r = __pyx_v_correlation_python;
+  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_magnitude, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 60, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_14 = __pyx_memoryview_fromslice(__pyx_v_frequencies, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 60, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_14);
+  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 60, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_GIVEREF(__pyx_t_2);
+  PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_14);
+  PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_t_14);
+  __pyx_t_2 = 0;
+  __pyx_t_14 = 0;
+  __pyx_r = __pyx_t_5;
+  __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "stft.pyx":32
+  /* "stft.pyx":33
  * 
  * 
  * cpdef play(audData, rate, length,windowSize,hopSize):             # <<<<<<<<<<<<<<
@@ -2278,14 +2463,15 @@ static PyObject *__pyx_f_4stft_play(PyObject *__pyx_v_audData, CYTHON_UNUSED PyO
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_12);
+  __Pyx_XDECREF(__pyx_t_14);
   __Pyx_AddTraceback("stft.play", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_audData_view, 1);
   __Pyx_XDECREF(__pyx_v_n_samples);
   __PYX_XDEC_MEMVIEW(&__pyx_v_correlation_result, 1);
-  __Pyx_XDECREF(__pyx_v_correlation_python);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_magnitude, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_frequencies, 1);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
@@ -2325,26 +2511,26 @@ static PyObject *__pyx_pw_4stft_1play(PyObject *__pyx_self, PyObject *__pyx_args
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_rate)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("play", 1, 5, 5, 1); __PYX_ERR(0, 32, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("play", 1, 5, 5, 1); __PYX_ERR(0, 33, __pyx_L3_error)
         }
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_length)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("play", 1, 5, 5, 2); __PYX_ERR(0, 32, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("play", 1, 5, 5, 2); __PYX_ERR(0, 33, __pyx_L3_error)
         }
         case  3:
         if (likely((values[3] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_windowSize)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("play", 1, 5, 5, 3); __PYX_ERR(0, 32, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("play", 1, 5, 5, 3); __PYX_ERR(0, 33, __pyx_L3_error)
         }
         case  4:
         if (likely((values[4] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_hopSize)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("play", 1, 5, 5, 4); __PYX_ERR(0, 32, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("play", 1, 5, 5, 4); __PYX_ERR(0, 33, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "play") < 0)) __PYX_ERR(0, 32, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "play") < 0)) __PYX_ERR(0, 33, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
       goto __pyx_L5_argtuple_error;
@@ -2363,7 +2549,7 @@ static PyObject *__pyx_pw_4stft_1play(PyObject *__pyx_self, PyObject *__pyx_args
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("play", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 32, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("play", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 33, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("stft.play", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2382,7 +2568,7 @@ static PyObject *__pyx_pf_4stft_play(CYTHON_UNUSED PyObject *__pyx_self, PyObjec
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("play", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_4stft_play(__pyx_v_audData, __pyx_v_rate, __pyx_v_length, __pyx_v_windowSize, __pyx_v_hopSize, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 32, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_4stft_play(__pyx_v_audData, __pyx_v_rate, __pyx_v_length, __pyx_v_windowSize, __pyx_v_hopSize, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 33, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
