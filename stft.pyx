@@ -4,6 +4,7 @@ from cpython cimport PyObject, Py_INCREF
 
 # Import the Python-level symbols of numpy
 import numpy as np
+import sys
 
 # Import the C-level symbols of numpy
 cimport numpy as np
@@ -26,35 +27,27 @@ cimport numpy as np
 np.import_array()
 
 cdef extern from "c_code/stft.c":
-    double* stft(double *wav_data, int wav_length, int windowSize, int hop_size, double *correlation_result,\
-                 double *magnitude, double *frequencies, int sample_freq)
+    double* stft(double *wav_data, int samples, int windowSize, int hop_size,\
+                 double *magnitude, int sample_freq)
 
-
-cpdef play(audData, rate, length,windowSize,hopSize):
+cpdef play(audData, rate,windowSize,hopSize):
 
     #create a memory view, pointer, that can be processed in C
     cdef double[:] audData_view = audData
-    #the total length of the correlation arrays is :
-    n_samples = int(length)
-    print("Total number of samples in Cython %d" % n_samples)
-    #create a view for the  double * correlation result pointer of C
-    cdef double[:] correlation_result = np.zeros(length)
-    #a view for the magnitude
-    cdef double[:] magnitude = np.zeros(length)
-    #a view for the frequencies
-    cdef double[:] frequencies = np.zeros(length)
-
+    #the total number of elements to retrieve from the C code is:
+    n_elements = len(audData)
+    #Create a view for the magnitude
+    cdef double[:] magnitude = np.zeros(n_elements)
     print("Analysis with these parameters:")
-    print("Length of the signal %d" % length)
+    print("Total number of samples %d" % n_elements)
     print("Windows length %d" % windowSize)
     print("Hopping size %d" % hopSize)
 
-    stft(&audData_view[0], length, windowSize, hopSize,&correlation_result[0],\
-         &magnitude[0], &frequencies[0], rate)
-    #correlation_python = np.asarray(correlation_result)
-    magnitude = np.asarray(magnitude)
-    frequencies = np.asarray(frequencies)
+    #compute the stft
+    stft(&audData_view[0], n_elements, windowSize, hopSize,&magnitude[0], rate)
 
-    #print(correlation_python)
-    #return (correlation_python)
-    return (magnitude, frequencies)
+    #translate the pointer to a numpy array
+    magnitude = np.asarray(magnitude)
+    #frequencies = np.asarray(frequencies)
+
+    return (magnitude)
