@@ -3,6 +3,7 @@
 #include <complex.h>
 #include <fftw3.h>
 #include <math.h>
+#include <stdbool.h>
 
 #define PI 3.14159265
 
@@ -19,7 +20,7 @@ double hamming(int windowLength, double *buffer){
 //and the correlation points between a chosen window --for the moment --
 //and all the other windows
 double* stft(double *wav_data, int samples, int windowSize, int hop_size,\
-             double *magnitude, int sample_freq)
+             double *magnitude, double *frequencies, int sample_freq)
 {
   //samples is now the  wav file length
   printf("Initialization of parameters...\n");
@@ -38,8 +39,8 @@ double* stft(double *wav_data, int samples, int windowSize, int hop_size,\
   stft_data = (fftw_complex*)(fftw_malloc(sizeof(fftw_complex)*windowSize));
   //stft_data = malloc(sizeof(double)*windowSize);
   fft_result= (fftw_complex*)(fftw_malloc(sizeof(fftw_complex)*windowSize));
-  storage = (fftw_complex*)(fftw_malloc(sizeof(fftw_complex)*(samples/2)));
-  printf("Total length of storage %d\n", (samples/2));
+  storage = (fftw_complex*)(fftw_malloc(sizeof(fftw_complex)*(samples)));
+  printf("Total length of storage %d\n", (samples));
   //exit(0);
   //define the fftw plane
   fftw_plan plan_forward, plan_backward;
@@ -60,78 +61,82 @@ double* stft(double *wav_data, int samples, int windowSize, int hop_size,\
   val_freq = 1.0/(windowSize*freq_spacing); //the total number of freq
   int N_val ;
   N_val = floor(windowSize/2)+1;
-  /*
-  printf("This is the scaling factor %.8f", scale);
-  printf("This is summa %.2f\n", summa);
-  printf("This is N %d and this is val %.2f\n", N_val, val_freq);
+  printf("Total number of freq in C %d\n", N_val);
   for (i=0 ; i<N_val; i++)
   {
     frequencies[i] = i*val_freq;
     //printf("Frequencies %.2f\n", frequencies[i]);
   }
-  */
+
 
   //now here we need to implement the stft
   int chunkPosition = 0; //actual chunk position
   int readIndex ; //read the index of the wav file
+  int n_elem_read = 0 ; //number of elements read -- for sanity check only
+  bool check ;
 
-  while (chunkPosition < samples ){
+
+  while (counter < samples ){
     //read the window
     for(i=0; i<windowSize; i++){
 
       readIndex = chunkPosition + i;
       //printf("Index position %d\n", readIndex);
 
-      if (readIndex < samples){
-        //stft_data[i][0] = wav_data[readIndex];//*hamming_result[i];
-        //stft_data[i][1] = 0.0;
-        stft_data[i] = wav_data[readIndex]*hamming_result[i]*_Complex_I  + 0.0*I;
-      }
-      else{
-        //if we are beyond the wav_length
-        stft_data[i] = 0.0*_Complex_I + 0.0*I;
-        //stft_data[i][0] = 0.0 ;  //this is ok if youdon'twant to use complex.h
-        //stft_data[i][1] = 0.0 ; //padding
-        break;
-      }
+      stft_data[i] = wav_data[readIndex]*hamming_result[i];//*_Complex_I  + 0.0*I;
+      n_elem_read+=1;
+      //printf("%.2f,",wav_data[readIndex]);
+
     }
+    //printf("\n");
     //compute the fft
     fftw_execute(plan_forward);
-    //store the stft in a data structure
-    for (i=0; i<windowSize/2 + 1;i++)
+    //store the half of the FFT in a data structure
+    for (i=0; i<windowSize/2 +1 ;i++)
     {
       //printf("RE: %.8f  IM: %.8f\n", creal(fft_result[i]/(windowSize)),cimag(fft_result[i]/(windowSize)));
-      storage[counter] = fft_result[i];///windowSize;//creal(fft_result[i]) + cimag(fft_result[i]);
+      storage[counter] = fft_result[i]; //fft_result[i];///windowSize;//creal(fft_result[i]) + cimag(fft_result[i]);
       //correlation_result[counter] = fft_result[i]*conj(fft_result[i])*scale;
+      //printf("%.8f  +  %.8f\n", fft_result[i]);
       counter+=1;
 
     }
 
-
-    chunkPosition += hop_size;
+    chunkPosition += hop_size/2;
     //printf("Chunk Position %d\n", chunkPosition);
     //printf("Counter position %d\n", counter);
+    //printf("Numb of read elements %d\n", n_elem_read);
+    //printf("Numb of samples %d\n",samples);
     //printf("Fourier transform done\n");
+    //printf("-----------------------------------------------------\n");
+
 
   }
+  printf("%d\n", counter);
 
   //printf("This is the storage capacity %d and this the counter %d\n", storage_capacity,counter);
   //normalize the fourier coefficients
   for (i=0; i<counter; i++)
   {
-    storage[i] /= windowSize;
+    storage[i] /= (windowSize/2);
   }
+  printf("Magnitude\n");
 
   for (i=0; i< counter; i++)
   {
-    magnitude[i] = (conj(storage[i])*(storage[i]))*scale; //cabs(storage[counter]);
+    magnitude[i] = cabs(storage[i]);//(conj(storage[i])*(storage[i]));//*scale; //cabs(storage[counter]);
     //frequencies[i] =  i*(sample_freq/windowSize);
   }
+
+  /*
+  FILE *ofile= fopen("fourier.dat", "w");
+
   printf("Total number of elements computed %d\n", counter);
-  //for(i=0; i<10 ; i++)
-  //{
-  //   printf("%.8f\n" , magnitude[i]);
-  //}
+  for(i=0; i<counter ; i++)
+  {
+     fprintf(ofile,"%.8f\n", magnitude[i]);
+
+  }*/
   //exit(0);
 
   /*Correlation among  windows
@@ -223,15 +228,13 @@ double* stft(double *wav_data, int samples, int windowSize, int hop_size,\
   */
   //clean up the memory
 
-  //return correlation_result ;
-  printf("This is the first element of magnitude %.2f\n", magnitude[0]);
-  return magnitude;//, frequencies;
 
-  fftw_destroy_plan(plan_forward);
-  fftw_free(stft_data);
-  fftw_free(fft_result);
+  //fftw_destroy_plan(plan_forward);
+  //fftw_free(stft_data);
+  //fftw_free(fft_result);
   //fftw_free(ifft_result);//do we need a ifft?
-  free(hamming_result);
+  //free(hamming_result);
 
+  return magnitude,frequencies;
 
 }

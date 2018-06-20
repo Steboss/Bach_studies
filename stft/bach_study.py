@@ -29,18 +29,21 @@ def padding(x, windowSize):
 #read the input file
 rate, audData = scipy.io.wavfile.read("../wav/partita2-1.wav")
 #extract the info
-length = audData.shape[0] # this is the number of samples,
+length = int(len(audData)/10)#audData.shape[0] # this is the number of samples,
 #if you divide length by the rateyou get the length in seconds /rate
-channel1 = audData[:,0]#[0:length]
+channel1 = audData[:,0][0:length]
+print("Total number of elements in the signarl %d"%length);
 #convert in double format
 channel1 = np.double(channel1)
 #channel2 = audData[:,1]
-windowSize = 8192 #length of the window to analyse with STFT
-hopSize = 8192  #hopsize between windows
+windowSize = 1024#8192 #length of the window to analyse with STFT
+hopSize = 1024#8192  #hopsize between windows
 
 #pad the signal based on the windowSize
 print("Padding signal...")
 signal = padding(channel1, windowSize)
+print("Dimension of the signal after boundary and padding %d\n"% len(signal))
+
 #UNCOMMENT if you want to analyse just a piece of the entire wav
 #save_wav = audData[:,0][0:length]
 #scipy.io.wavfile.write("study.wav",rate,save_wav)
@@ -51,42 +54,42 @@ signal = padding(channel1, windowSize)
 
 #compute the STFT
 print("STFT...")
-magnitude = stft.play(signal, rate , windowSize, hopSize)
-#roll the axis
-#n_samples = length/windowSize + (length%windowSize)
-#print(n_samples)
-#sys.exit(-1)
+#magnitude,frequencies = stft.play(signal, rate , windowSize, hopSize)
+#print(type(frequencies))
+#print(frequencies.shape)
 
-#now recreate the magnitude array
-#columns = total signal lengt/windowsize/2
-#rows = windowsize/2 +1
-cols = int(len(signal)/(windowSize/2))
-rows = int(windowSize/2)+1
-new_array = np.zeros([cols,rows])
-counter = 0
-for i in range(0,cols):
-    for j in range(0,rows):
-        new_array[i][j] = magnitude[counter]
-        counter+=1
-        #print(counter)
-print(counter)
-print(new_array.shape())
-sys.exit(-1)
-print(np.version.version)
+#signal = [1,2,3,4,5,6,7,8,9,10]
+#signal = np.asarray(signal)
+#signal = padding(signal,8)
+#print(signal)
+#rate = 1
+#windowSize = 8
+#hopSize = 8
+magnitude, frequencies = stft.play(signal, rate , windowSize, hopSize)
+#print(magnitude.shape)
+print("Roll magnitude values")
 magnitude = np.rollaxis(magnitude, -1, -2)
-for i in range(0,10):
-    print(magnitude[i])
+#print(magnitude.shape)
+start_time = int(windowSize/2)
+stop_time  = int(magnitude.shape[-1] - windowSize/2 +1)
+
+time = np.arange(windowSize/2, signal.shape[-1] - windowSize/2 + 1,
+                 windowSize - (windowSize/2))/float(rate)
+
+time -= (windowSize/2)/ rate
+#for i in range(0,10):#
+#    print(magnitude[i])
 #PLOT
 #x-axis for  the data
-x_axis_ref = np.linspace(0, len(magnitude)/2,len(magnitude)/2)
-magnitude = magnitude[0:len(magnitude)/2]
+'''
+x_axis_ref = np.linspace(0, len(magnitude),len(magnitude))
 #colors andfigure
 colors= sbn.color_palette()
 col_ref = sbn.color_palette("cubehelix", 8)
 fig = plt.figure(figsize=[15,10])
 ax = fig.add_subplot(111)
 #axis plot
-ax.plot(x_axis_ref,magnitude,color="blue",linewidth=2.5,zorder=10)
+ax.plot(x_axis_ref,np.abs(magnitude))
 ax.xaxis.set_tick_params(labelsize=30)
 ax.yaxis.set_tick_params(labelsize=30)
 ax.set_ylabel(r"Freq",fontsize=30)
@@ -96,33 +99,21 @@ ax.set_xlabel(r"ticks",fontsize=30)
 
 plt.tight_layout()
 plt.savefig("power_spectrum.pdf")#,bbox_extra_artists=(lgd,), bbox_inches='tight')
-
-
-#plt.savefig("newCB8.png",dpi=300,bbox_extra_artists=(lgd,), bbox_inches='tight')
+plt.clf()
 '''
-rate, audData = scipy.io.wavfile.read("wav/toccata_fugue_dmin.wav")
-length = audData.shape[0]/rate #take only the first 10 seconds
-#fugue 2.30 = 190 sec
-#the fugue is 6700000:22342656
-channel1 = audData[:,0][6740000:22342656]
-#length for one single note: 6740000:6745000 --A
-wind_length = 6745000-6740000
-print("window length :%d" % wind_length)
-#scipy.io.wavfile.write("test.wav",rate,channel1)
-
-#sample_length = len(audData[:,0][0:1500000])
-#create various fourier spectogram
-print("Computing  Custom window...")
-#this must be done with stft
-#stft.play(channel1)
-#f256,t256,Zxx256 = stft(channel1, fs=rate,window="hann",nperseg=wind_length)
-
-print("Computing  256 window...")
-f256,t256,Zxx256 = stft(channel1, fs=rate,window="hann",nperseg=256)
-print("Computing 1024 window...")
-f1024,t1024,Zxx1024 = stft(channel1, fs=rate,window="hann",nperseg=1024)
-print("Computing 4096 window...")
-f4096,t4096,Zxx4096 = stft(channel1, fs=rate,window="hann",nperseg=4096)
-print("Computing 8192 window...")
-f8192,t8192,Zxx8192 = stft(channel1, fs=rate,window="hann",nperseg=8192)
-'''
+#plot frequenceis
+print("plotting frequencies...")
+fig = plt.figure(figsize=[15,10])
+ax = fig.add_subplot(111)
+#ax.imshow(np.abs(magnitude))
+print("Computing magnitude in dB...")
+magnitude = 20*np.log10(np.abs(magnitude))
+magnitude = np.clip(magnitude, -40, 200)
+print("pcolormesh call")
+print(type(magnitude))
+print(magnitude.shape)
+ax.pcolormesh(time, frequencies, magnitude, vmin=0, vmax=0.5,cmap="bwr")
+ax.set_ylabel(r"Frequency / Hz",fontsize=20)
+ax.set_xlabel(r"Time / s",fontsize=20)
+plt.tight_layout()
+plt.savefig("frequencies.png")

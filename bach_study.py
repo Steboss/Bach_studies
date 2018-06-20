@@ -40,7 +40,7 @@ hopSize = 8192  #hopsize between windows
 
 #pad the signal based on the windowSize
 print("Padding signal...")
-signal = padding(channel1, windowSize)
+signal = padding(channel1, windowSize
 #UNCOMMENT if you want to analyse just a piece of the entire wav
 #save_wav = audData[:,0][0:length]
 #scipy.io.wavfile.write("study.wav",rate,save_wav)
@@ -51,17 +51,17 @@ signal = padding(channel1, windowSize)
 
 #compute the STFT
 print("STFT...")
-magnitude = stft.play(signal, rate , windowSize, hopSize)
+magnitude,frequencies = stft.play(signal, rate , windowSize, hopSize)
 #roll the axis
 #n_samples = length/windowSize + (length%windowSize)
 #print(n_samples)
 #sys.exit(-1)
-
 #now recreate the magnitude array
 #columns = total signal lengt/windowsize/2
 #rows = windowsize/2 +1
-cols = int(len(signal)/(windowSize/2))
+cols = int(len(signal)/(windowSize/2)) -1
 rows = int(windowSize/2)+1
+print(cols, rows)
 new_array = np.zeros([cols,rows])
 counter = 0
 for i in range(0,cols):
@@ -69,24 +69,30 @@ for i in range(0,cols):
         new_array[i][j] = magnitude[counter]
         counter+=1
         #print(counter)
-print(counter)
-print(new_array.shape())
-sys.exit(-1)
-print(np.version.version)
-magnitude = np.rollaxis(magnitude, -1, -2)
-for i in range(0,10):
-    print(magnitude[i])
+
+magnitude = np.rollaxis(new_array, -1, -2)
+
+start_time = int(windowSize/2)
+stop_time  = int(magnitude.shape[-1] - windowSize/2 +1)
+print(start_time, stop_time)
+
+time = np.arange(windowSize/2, signal.shape[-1] - windowSize/2 + 1,
+                 windowSize)/float(rate)
+
+time -= (windowSize/2)/ rate
+#for i in range(0,10):#
+#    print(magnitude[i])
 #PLOT
 #x-axis for  the data
-x_axis_ref = np.linspace(0, len(magnitude)/2,len(magnitude)/2)
-magnitude = magnitude[0:len(magnitude)/2]
+
+x_axis_ref = np.linspace(0, len(magnitude),len(magnitude))
 #colors andfigure
 colors= sbn.color_palette()
 col_ref = sbn.color_palette("cubehelix", 8)
 fig = plt.figure(figsize=[15,10])
 ax = fig.add_subplot(111)
 #axis plot
-ax.plot(x_axis_ref,magnitude,color="blue",linewidth=2.5,zorder=10)
+ax.plot(x_axis_ref,np.abs(magnitude))
 ax.xaxis.set_tick_params(labelsize=30)
 ax.yaxis.set_tick_params(labelsize=30)
 ax.set_ylabel(r"Freq",fontsize=30)
